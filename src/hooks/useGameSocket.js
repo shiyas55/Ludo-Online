@@ -6,24 +6,24 @@ export function useGameSocket() {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [room, setRoom] = useState(null);
-  const [playerId, setPlayerId] = useState(localStorage.getItem('ludo_playerId') || null);
-  const [currentRoomCode, setCurrentRoomCode] = useState(localStorage.getItem('ludo_roomId') || null);
+  const [playerId, setPlayerId] = useState(sessionStorage.getItem('ludo_playerId') || null);
+  const [currentRoomCode, setCurrentRoomCode] = useState(sessionStorage.getItem('ludo_roomId') || null);
   const [chatMessages, setChatMessages] = useState([]);
   const [diceMovableTokens, setDiceMovableTokens] = useState([]);
   const [isDiceRolling, setIsDiceRolling] = useState(false);
 
   const socketRef = useRef(null);
 
-  // Helper to store session in localStorage
+  // Helper to store session in sessionStorage
   const saveSession = (rId, pId) => {
     if (rId && pId) {
-      localStorage.setItem('ludo_roomId', rId);
-      localStorage.setItem('ludo_playerId', pId);
+      sessionStorage.setItem('ludo_roomId', rId);
+      sessionStorage.setItem('ludo_playerId', pId);
       setCurrentRoomCode(rId);
       setPlayerId(pId);
     } else {
-      localStorage.removeItem('ludo_roomId');
-      localStorage.removeItem('ludo_playerId');
+      sessionStorage.removeItem('ludo_roomId');
+      sessionStorage.removeItem('ludo_playerId');
       setCurrentRoomCode(null);
       setPlayerId(null);
       setRoom(null);
@@ -51,8 +51,8 @@ export function useGameSocket() {
       setIsConnected(true);
 
       // Auto-reconnect if we have local session
-      const storedRoomId = localStorage.getItem('ludo_roomId');
-      const storedPlayerId = localStorage.getItem('ludo_playerId');
+      const storedRoomId = sessionStorage.getItem('ludo_roomId');
+      const storedPlayerId = sessionStorage.getItem('ludo_playerId');
       
       if (storedRoomId && storedPlayerId) {
         console.log('Attempting automatic reconnection...');
@@ -101,7 +101,7 @@ export function useGameSocket() {
       
       // If it is our turn, capture the movable tokens list
       const activeSeat = updatedRoom.gameState?.activeSeats[updatedRoom.gameState.turnIndex];
-      const me = updatedRoom.players.find(p => p.id === localStorage.getItem('ludo_playerId'));
+      const me = updatedRoom.players.find(p => p.id === sessionStorage.getItem('ludo_playerId'));
       const isSameDevice = updatedRoom.mode === 'local';
       
       if (isSameDevice || (me && me.seatIndex === activeSeat)) {
