@@ -34,7 +34,10 @@ export default function RadialBoard({ room, playerId, diceMovableTokens, onToken
   }, [room, playerId]);
 
   const activeSeat = gameState?.activeSeats?.[gameState?.turnIndex];
-  const isMyTurn = me && me.seatIndex === activeSeat && gameState?.hasRolled;
+  const isSameDevice = room?.mode === 'local';
+  const isMyTurn = gameState?.hasRolled && (
+    isSameDevice || (me && me.seatIndex === activeSeat)
+  );
 
   // Render tokens
   const renderedTokens = useMemo(() => {

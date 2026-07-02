@@ -31,10 +31,10 @@ export function useGameSocket() {
   };
 
   useEffect(() => {
-    // In dev: connect directly to Express server on port 3001 to bypass proxy issues
+    // In dev: connect directly to Express server using the current hostname to support local network devices (like mobile phones)
     // In prod: use backend URL or host origin
     const socketUrl = import.meta.env.DEV
-      ? 'http://localhost:3001'
+      ? `http://${window.location.hostname}:3001`
       : (import.meta.env.VITE_BACKEND_URL || window.location.origin);
     
     console.log('Connecting to WebSocket server at:', socketUrl);
@@ -102,8 +102,9 @@ export function useGameSocket() {
       // If it is our turn, capture the movable tokens list
       const activeSeat = updatedRoom.gameState?.activeSeats[updatedRoom.gameState.turnIndex];
       const me = updatedRoom.players.find(p => p.id === localStorage.getItem('ludo_playerId'));
+      const isSameDevice = updatedRoom.mode === 'local';
       
-      if (me && me.seatIndex === activeSeat) {
+      if (isSameDevice || (me && me.seatIndex === activeSeat)) {
         setDiceMovableTokens(movableTokens);
       } else {
         setDiceMovableTokens([]);
