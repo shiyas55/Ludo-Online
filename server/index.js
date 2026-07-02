@@ -12,6 +12,7 @@ import {
   rollDiceState, 
   moveTokenState, 
   handleBotTurn,
+  passTurn,
   COLORS 
 } from './game.js';
 
@@ -73,7 +74,7 @@ app.get('/api/history', async (req, res) => {
 });
 
 // Fallback all frontend routes to React index.html in production
-app.get('/*', (req, res) => {
+app.get(/.*/, (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'), (err) => {
     if (err) {
       res.status(200).send('Ludo Server is running! Frontend is not built yet.');
@@ -410,6 +411,7 @@ io.on('connection', (socket) => {
           if (movableTokens.length === 0) {
             setTimeout(() => {
               if (room.status === 'playing') {
+                passTurn(room);
                 db.saveRoom(room).catch(e => console.error(e));
                 io.to(room.roomId).emit('room_updated', room);
                 triggerBotTurnIfNeeded(room);
